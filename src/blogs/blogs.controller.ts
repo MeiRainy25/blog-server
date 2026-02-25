@@ -7,9 +7,10 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { BlogService } from './blogs.service';
-import { CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
+import { BlogsQueryDto, CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Blogs')
@@ -20,8 +21,8 @@ export class BlogController {
 
   @Get()
   @ApiOperation({ summary: '获取所有博客' })
-  getBlogs() {
-    return this.blogService.getBlogs();
+  getBlogs(@Query() query: BlogsQueryDto) {
+    return this.blogService.getBlogs(query);
   }
 
   @Get(':id')

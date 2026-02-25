@@ -33,6 +33,9 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalFilters(new ExceptionsFilter());
-  await app.listen(process.env.PORT ?? 3000);
+
+  app.setGlobalPrefix('api');
+
+  await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

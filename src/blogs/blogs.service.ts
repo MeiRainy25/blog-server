@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
+import { BlogsQueryDto, CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
 
 @Injectable()
 export class BlogService {
@@ -8,8 +8,45 @@ export class BlogService {
 
   constructor(private prisma: PrismaService) {}
 
-  async getBlogs() {
-    return this.prisma.blog.findMany();
+  async getBlogs(query: BlogsQueryDto) {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const skip = (page - 1) * pageSize;
+
+    const orderBy = { [query.sortBy ?? 'createdAt']: query.order ?? 'desc' };
+    const [blogs, total] = await this.prisma.$transaction([
+      this.prisma.blog.findMany({
+        skip,
+        take: pageSize,
+        orderBy,
+        select: {
+          id: true,
+          title: true,
+          createdAt: true,
+          updatedAt: true,
+
+          author: {
+            select: {
+              id: true,
+              nickname: true,
+            },
+          },
+
+          tags: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      }),
+      this.prisma.blog.count(),
+    ]);
+
+    return {
+      total,
+      data: blogs,
+    };
   }
 
   async getBlog(id: string) {
