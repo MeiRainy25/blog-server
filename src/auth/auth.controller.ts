@@ -40,8 +40,14 @@ export class AuthController {
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000,
+    });
 
-    return { accessToken: tokens.accessToken };
+    return;
   }
 
   @Post('register')
@@ -59,14 +65,22 @@ export class AuthController {
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
-    return { accessToken: tokens.accessToken };
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000,
+    });
+    return;
   }
 
   @Post('refresh')
   @UseGuards(RefreshJwtGuard)
   @ApiOperation({ summary: '刷新AccessToken' })
-  async refreshAccessToken(@Req() req: Request) {
+  async refreshAccessToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const user = req.user as { sub: string } | null;
     const refreshToken = req.cookies['refreshToken'] as string | undefined;
 
@@ -79,7 +93,14 @@ export class AuthController {
       refreshToken,
     );
 
-    return { accessToken };
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return;
   }
 
   @Post('logout')
