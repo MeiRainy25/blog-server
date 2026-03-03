@@ -16,6 +16,7 @@ import type { Request, Response } from 'express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RefreshJwtGuard } from './guards/refresh.jwt.guard';
 import { AccessJwtGuard } from './guards/access.jwt.guard';
+import { UsersService } from 'src/users/users.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('auth')
@@ -23,7 +24,10 @@ import { AccessJwtGuard } from './guards/access.jwt.guard';
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post('login')
   @ApiOperation({ summary: '登录' })
@@ -32,6 +36,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.login(dto);
+    const currUser = await this.usersService.getUserByEmail(dto.email);
 
     // 设置httponly cookie 存储refreshToken
     res.cookie('refreshToken', tokens.refreshToken, {
@@ -47,7 +52,13 @@ export class AuthController {
       maxAge: 15 * 60 * 1000,
     });
 
-    return;
+    return {
+      user: {
+        id: currUser?.id,
+        email: currUser?.email,
+        nickname: currUser?.nickname,
+      },
+    };
   }
 
   @Post('register')
@@ -57,6 +68,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.register(dto);
+    const currUser = await this.usersService.getUserByEmail(dto.email);
 
     // 设置httponly cookie 存储refreshToken
     res.cookie('refreshToken', tokens.refreshToken, {
@@ -71,7 +83,13 @@ export class AuthController {
       sameSite: 'strict',
       maxAge: 15 * 60 * 1000,
     });
-    return;
+    return {
+      user: {
+        id: currUser?.id,
+        email: currUser?.email,
+        nickname: currUser?.nickname,
+      },
+    };
   }
 
   @Post('refresh')

@@ -16,7 +16,7 @@ import { AccessJwtGuard } from 'src/auth/guards/access.jwt.guard';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('Users')
-@Controller('users')
+@Controller('manage/users')
 @UseGuards(AccessJwtGuard)
 export class UsersController {
   constructor(private readonly userService: UsersService) {}

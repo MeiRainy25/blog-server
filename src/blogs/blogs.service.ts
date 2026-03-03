@@ -52,6 +52,25 @@ export class BlogService {
   async getBlog(id: string) {
     return this.prisma.blog.findUnique({
       where: { id },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+        tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
   }
 
@@ -69,6 +88,7 @@ export class BlogService {
   }
 
   async updateBlog(id: string, dto: UpdateBlogDto) {
+    this.logger.debug(`Updating blog ${id} with data: ${JSON.stringify(dto)}`);
     return await this.prisma.blog.update({
       where: { id },
       data: {

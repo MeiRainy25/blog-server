@@ -3,24 +3,25 @@ import {
   Controller,
   Delete,
   Get,
-  Logger,
   Param,
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogService } from './blogs.service';
 import { BlogsQueryDto, CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AccessJwtGuard } from 'src/auth/guards/access.jwt.guard';
 
-@ApiTags('Blogs')
-@Controller('blogs')
-export class BlogController {
-  private readonly logger = new Logger(BlogController.name);
+@ApiTags('ManageBlogs')
+@Controller('manage/blogs')
+@UseGuards(AccessJwtGuard)
+export class BlogManageController {
   constructor(private readonly blogService: BlogService) {}
 
   @Get()
-  @ApiOperation({ summary: '获取所有博客' })
+  @ApiOperation({ summary: '分页获取所有博客' })
   getBlogs(@Query() query: BlogsQueryDto) {
     return this.blogService.getBlogs(query);
   }
