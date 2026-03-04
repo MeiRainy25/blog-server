@@ -36,6 +36,8 @@ export class BlogService {
             select: {
               id: true,
               name: true,
+              color: true,
+              group: true,
             },
           },
         },
@@ -68,6 +70,8 @@ export class BlogService {
           select: {
             id: true,
             name: true,
+            color: true,
+            group: true,
           },
         },
       },

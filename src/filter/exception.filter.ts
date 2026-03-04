@@ -40,6 +40,25 @@ export class ExceptionsFilter implements ExceptionFilter {
       user: req.user ?? null,
     };
 
+    /**
+     * 403 和 401报错的处理
+     */
+    if (
+      (status === 401 &&
+        ['REFRESH_TOKEN_EXPIRED', 'REFRESH_TOKEN_INVALID'].includes(
+          normalized.code as string,
+        )) ||
+      status === 403
+    ) {
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict' as const,
+      };
+      res.clearCookie('accessToken', cookieOptions);
+      res.clearCookie('refreshToken', cookieOptions);
+    }
+
     if (status >= 500) {
       this.logger.error(
         `${req.method} ${req.url} ${status} | Request: ${JSON.stringify(requestInfo)}`,

@@ -41,8 +41,8 @@ model Tag {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   blogs     Blog[]   @relation("BlogTags")
-  group     String   @unique // Tag分组
-  color     String // Tag颜色
+  group     String?  // Tag分组
+  color     String? // Tag颜色
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
