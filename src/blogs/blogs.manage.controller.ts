@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,12 +8,15 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { BlogService } from './blogs.service';
 import { BlogsQueryDto, CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AccessJwtGuard } from 'src/auth/guards/access.jwt.guard';
+import type { Response } from 'express';
+import archiver from 'archiver';
 
 @ApiTags('ManageBlogs')
 @Controller('manage/blogs')
@@ -48,5 +52,44 @@ export class BlogManageController {
   @ApiOperation({ summary: '删除博客' })
   deleteBlog(@Param('id') id: string) {
     return this.blogService.deleteBlog(id);
+  }
+
+  @Post('export')
+  @ApiOperation({ summary: '批量导出Markdown' })
+  async exportMarkdownZip(
+    @Body() body: { ids: string[] },
+    @Res() res: Response,
+  ) {
+    const ids = body?.ids ?? [];
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new BadRequestException('导出内容不能为空');
+    }
+
+    const blogs = await this.blogService.getBlogsForExport(ids);
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="blogs-${Date.now()}.zip"`,
+    );
+
+    const zip = archiver('zip', { zlib: { level: 9 } });
+
+    zip.on('error', (err) => {
+      throw err;
+    });
+
+    zip.pipe(res);
+
+    for (const blog of blogs) {
+      const safeTitle = blog.title.replace(/[\\/:*?"<>|]/g, '-').trim();
+
+      const filename = `${safeTitle}-${blog.id}.md`;
+      const md = blog.markdown as string;
+
+      zip.append(md, { name: filename });
+    }
+
+    await zip.finalize();
   }
 }

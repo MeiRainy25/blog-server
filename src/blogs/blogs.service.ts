@@ -84,6 +84,7 @@ export class BlogService {
         title: dto.title,
         content: dto.content,
         authorId: dto.authorId,
+        markdown: dto.markdown,
         tags: {
           connect: dto.tags?.map((id) => ({ id })) ?? [],
         },
@@ -98,6 +99,7 @@ export class BlogService {
       data: {
         title: dto.title,
         content: dto.content,
+        markdown: dto.markdown,
         tags: {
           set: dto.tags?.map((id) => ({ id })) ?? [],
         },
@@ -108,6 +110,18 @@ export class BlogService {
   async deleteBlog(id: string) {
     return this.prisma.blog.delete({
       where: { id },
+    });
+  }
+
+  async getBlogsForExport(ids: string[]) {
+    return this.prisma.blog.findMany({
+      where: { id: { in: ids } },
+      select: {
+        id: true,
+        title: true,
+        markdown: true,
+      },
+      orderBy: { updatedAt: 'desc' },
     });
   }
 }

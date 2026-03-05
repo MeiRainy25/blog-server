@@ -30,6 +30,7 @@ model Blog {
   id        String   @id @default(cuid())
   title     String
   content   Json
+  markdown  String
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String
   tags      Tag[]    @relation("BlogTags")
@@ -41,7 +42,7 @@ model Tag {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   blogs     Blog[]   @relation("BlogTags")
-  group     String?  // Tag分组
+  group     String? // Tag分组
   color     String? // Tag颜色
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

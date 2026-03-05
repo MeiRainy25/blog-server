@@ -30,6 +30,13 @@ export class CreateBlogDto {
   content: BlogContent;
 
   @IsString()
+  @ApiProperty({
+    example: 'Hello, this is a markdown content.',
+    description: '博客内容（Markdown文本）, 用于博客导出',
+  })
+  markdown: string;
+
+  @IsString()
   @ApiProperty({ example: 'userId123', description: '作者ID' })
   authorId: string;
 
@@ -57,6 +64,14 @@ export class UpdateBlogDto {
     description: '博客内容（TipTap JSON）',
   })
   content?: BlogContent;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    example: 'Hello, this is a markdown content.',
+    description: '博客内容（Markdown文本）, 用于博客导出',
+  })
+  markdown?: string;
 
   @IsOptional()
   @IsArray()
