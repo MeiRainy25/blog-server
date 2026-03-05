@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CreateUserDto,
   UpdatePasswordDto,
@@ -7,6 +12,7 @@ import {
 import { UserEntity } from 'src/auth/auth.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hash } from 'argon2';
+import { isPrismaExistException } from 'src/util';
 
 @Injectable()
 export class UsersService {
@@ -37,23 +43,41 @@ export class UsersService {
   }
 
   async createUser(dto: CreateUserDto) {
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        nickname: dto.nickname,
-        password: dto.password,
-        refreshToken: dto.refreshToken,
-      },
-    });
-    return new UserEntity(user);
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          nickname: dto.nickname,
+          password: dto.password,
+          refreshToken: dto.refreshToken,
+        },
+      });
+      return new UserEntity(user);
+    } catch (e) {
+      if (isPrismaExistException(e)) {
+        this.logger.warn(`User with email ${dto.email} already exists`);
+        throw new BadRequestException(`该用户已存在`);
+      }
+
+      throw e;
+    }
   }
 
   async updateUser(userId: string, dto: UpdateUserDto) {
-    const user = await this.prisma.user.update({
-      where: { id: userId },
-      data: dto,
-    });
-    return new UserEntity(user);
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: dto,
+      });
+      return new UserEntity(user);
+    } catch (e) {
+      if (isPrismaExistException(e)) {
+        this.logger.warn(`User with email ${dto.email} already exists`);
+        throw new BadRequestException(`该用户已存在`);
+      }
+
+      throw e;
+    }
   }
 
   async deleteUser(userId: string) {
@@ -93,7 +117,6 @@ export class UsersService {
           refreshToken: null,
         },
       });
-      this.logger.log(`${userId} 的密码已更新, refreshToken已清空`);
     });
   }
 }

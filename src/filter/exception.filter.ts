@@ -6,6 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { Prisma } from 'generated/prisma/client';
 
 type NormalizedResponse = {
   message: string;
@@ -22,6 +23,24 @@ export class ExceptionsFilter implements ExceptionFilter {
     const req = ctx.getRequest<Request>();
     const res = ctx.getResponse<Response>();
 
+    /**
+     * Prisma已知错误
+     */
+    const prismaMapped = this.mapPrismaException(exception);
+    if (prismaMapped) {
+      const { status, body } = prismaMapped;
+      this.logger.warn(
+        `${req.method} ${req.url} ${status} | PRISMA:${body.code ?? '-'} | ${body.message}`,
+      );
+      return res.status(status).json({
+        status,
+        timestamp: new Date().toISOString(),
+        path: req.url,
+        ...body,
+      });
+    }
+
+    // 其他错误处理
     const status =
       exception instanceof HttpException ? exception.getStatus() : 500;
 
@@ -42,6 +61,7 @@ export class ExceptionsFilter implements ExceptionFilter {
 
     /**
      * 403 和 401报错的处理
+     * 清空存储 token 的cookie
      */
     if (
       (status === 401 &&
@@ -120,5 +140,42 @@ export class ExceptionsFilter implements ExceptionFilter {
 
     // 3.其他情况
     return { message: 'Internal Error', details: raw };
+  }
+
+  private mapPrismaException(exception: unknown): {
+    status: number;
+    body: NormalizedResponse;
+  } | null {
+    if (!(exception instanceof Prisma.PrismaClientKnownRequestError))
+      return null;
+
+    switch (exception.code) {
+      case 'P2002':
+        // 唯一冲突 unique数据重复时发生
+        return {
+          status: 400,
+          body: { message: '数据已存在', code: 'PRISMA_UNIQUE_CONSTRAINT' },
+        };
+      case 'P2003':
+        // 外键约束出现问题
+        return {
+          status: 400,
+          body: {
+            message: '关联数据不存在或关联失败',
+            code: 'PRISMA_FOREIGN_KEY_CONSTRAINT',
+          },
+        };
+      case '2025':
+        // 目标不存在
+        return {
+          status: 404,
+          body: { message: '资源不存在', code: 'PRISMA_RECORD_NOT_FOUND' },
+        };
+      default:
+        return {
+          status: 500,
+          body: { message: '数据库操作失败', code: `PRISMA_${exception.code}` },
+        };
+    }
   }
 }
