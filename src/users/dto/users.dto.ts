@@ -1,30 +1,47 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import {
+  IsEmail,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  MinLength,
+} from 'class-validator';
 
-export class CreateUserDto {
-  @ApiProperty({
-    example: 'test@example.com',
-    description: 'User email address',
-  })
-  email: string;
+export class UsersQueryDto {
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @ApiPropertyOptional({ example: 1, description: '页码，默认为1' })
+  page?: number = 1;
 
-  @ApiProperty({
-    example: 'testuser',
-    description: 'User nickname',
-  })
-  nickname: string;
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  @ApiPropertyOptional({ example: 10, description: '单页数据量, 默认10' })
+  pageSize?: number = 10;
 
-  @ApiProperty({
-    example: 'password123',
-    description: 'User password',
+  @IsOptional()
+  @IsIn(['createdAt', 'updatedAt'])
+  @ApiPropertyOptional({
+    example: 'createdAt',
+    description: '排序字段，默认为createdAt',
   })
-  password: string;
+  sortBy?: 'createdAt' | 'updatedAt' = 'createdAt';
 
-  @ApiProperty({
-    example: 'refreshToken123',
-    description: 'User refresh token',
+  @IsOptional()
+  @IsIn(['asc', 'desc'])
+  @ApiPropertyOptional({
+    example: 'desc',
+    description: '排序方式，默认为desc',
   })
-  refreshToken?: string;
+  order?: 'asc' | 'desc' = 'desc';
 }
 
 export class UpdateUserDto {
@@ -52,6 +69,38 @@ export class UpdateUserDto {
     description: 'User password',
   })
   password?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    example: 'refreshToken123',
+    description: 'User refresh token',
+  })
+  refreshToken?: string;
+}
+
+export class CreateUserDto {
+  @IsEmail()
+  @ApiProperty({
+    example: 'test@example.com',
+    description: 'User email address',
+  })
+  email: string;
+
+  @IsString()
+  @ApiProperty({
+    example: 'testuser',
+    description: 'User nickname',
+  })
+  nickname: string;
+
+  @MinLength(6)
+  @IsString()
+  @ApiProperty({
+    example: 'password123',
+    description: 'User password',
+  })
+  password: string;
 
   @IsOptional()
   @IsString()

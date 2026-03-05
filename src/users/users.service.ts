@@ -8,6 +8,7 @@ import {
   CreateUserDto,
   UpdatePasswordDto,
   UpdateUserDto,
+  UsersQueryDto,
 } from './dto/users.dto';
 import { UserEntity } from 'src/auth/auth.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -20,9 +21,33 @@ export class UsersService {
 
   constructor(private prisma: PrismaService) {}
 
-  async getUsers() {
-    const users = await this.prisma.user.findMany();
-    return users.map((user) => new UserEntity(user));
+  async getUsers(query: UsersQueryDto) {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const skip = (page - 1) * pageSize;
+
+    const orderBy = { [query.sortBy ?? 'createdAt']: query.order ?? 'desc' };
+
+    const [users, total] = await this.prisma.$transaction([
+      this.prisma.user.findMany({
+        skip,
+        take: pageSize,
+        orderBy,
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+      this.prisma.user.count(),
+    ]);
+
+    return {
+      data: users.map((user) => new UserEntity(user)),
+      total,
+    };
   }
 
   async getUserById(id: string) {
