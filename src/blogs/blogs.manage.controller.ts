@@ -85,7 +85,7 @@ export class BlogManageController {
       const safeTitle = blog.title.replace(/[\\/:*?"<>|]/g, '-').trim();
 
       const filename = `${safeTitle}-${blog.id}.md`;
-      const md = blog.markdown as string;
+      const md = blog.markdown;
 
       zip.append(md, { name: filename });
     }
