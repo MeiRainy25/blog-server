@@ -1,4 +1,4 @@
-import { Prisma } from 'generated/prisma/client';
+import { Prisma } from 'lib/prisma/client';
 
 export function isPrismaExistException(error: unknown) {
   if (

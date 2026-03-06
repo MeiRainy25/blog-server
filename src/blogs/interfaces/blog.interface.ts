@@ -1,3 +1,3 @@
-import { Prisma } from '../../../generated/prisma/client';
+import { Prisma } from 'lib/prisma/client';
 
 export type BlogContent = Prisma.InputJsonValue;

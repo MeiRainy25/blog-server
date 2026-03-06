@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { Prisma } from 'generated/prisma/client';
+import { Prisma } from 'lib/prisma/client';
 
 type NormalizedResponse = {
   message: string;
