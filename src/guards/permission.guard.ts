@@ -35,8 +35,9 @@ export class PermissionsGuard implements CanActivate {
     }
 
     const codes = await this.permissionService.getUserPermissions(userId);
+    const set = new Set(codes);
 
-    const ok = required.every((p) => codes.has(p));
+    const ok = required.every((p) => set.has(p));
     if (!ok) {
       throw new ForbiddenException('权限不足');
     }

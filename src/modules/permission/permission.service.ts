@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class PermissionService {
+  private readonly logger = new Logger(PermissionService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   // 获取用户权限
@@ -26,8 +28,6 @@ export class PermissionService {
         return pCodes;
       }) ?? [];
 
-    const permissionCodes = new Set<string>(codes);
-
-    return permissionCodes;
+    return [...new Set(codes)];
   }
 }
