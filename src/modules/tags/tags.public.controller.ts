@@ -1,6 +1,6 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AccessJwtGuard } from 'src/auth/guards/access.jwt.guard';
+import { AccessJwtGuard } from 'src/guards/access.jwt.guard';
 import { TagsService } from './tags.service';
 import { TagsQueryDto } from './dto/tags.dto';
 

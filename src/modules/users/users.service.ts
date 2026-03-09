@@ -10,8 +10,8 @@ import {
   UpdateUserDto,
   UsersQueryDto,
 } from './dto/users.dto';
-import { UserEntity } from 'src/auth/auth.entity';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { UserEntity } from 'src/modules/auth/auth.entity';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { hash } from 'argon2';
 import { isPrismaExistException } from 'src/util';
 
@@ -143,5 +143,35 @@ export class UsersService {
         },
       });
     });
+  }
+
+  // 获取用户权限
+  async getUserPermissions(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        roles: {
+          select: {
+            permissions: {
+              select: { code: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`用户${userId}不存在`);
+    }
+
+    const codes: string[] =
+      user?.roles.flatMap((role) => {
+        const pCodes = role.permissions.map((p) => p.code as string);
+        return pCodes as string[];
+      }) ?? [];
+
+    const permissionCodes = new Set<string>(codes);
+
+    return permissionCodes;
   }
 }

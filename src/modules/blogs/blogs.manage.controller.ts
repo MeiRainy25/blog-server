@@ -14,10 +14,10 @@ import {
 import { BlogService } from './blogs.service';
 import { BlogsQueryDto, CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AccessJwtGuard } from 'src/auth/guards/access.jwt.guard';
+import { AccessJwtGuard } from 'src/guards/access.jwt.guard';
 import type { Response } from 'express';
 import archiver from 'archiver';
-
+import { RequirePermissions } from 'src/decorator/permission.decorator';
 @ApiTags('ManageBlogs')
 @Controller('manage/blogs')
 @UseGuards(AccessJwtGuard)
@@ -25,36 +25,42 @@ export class BlogManageController {
   constructor(private readonly blogService: BlogService) {}
 
   @Get()
+  @RequirePermissions('blog.read')
   @ApiOperation({ summary: '分页获取所有博客' })
   getBlogs(@Query() query: BlogsQueryDto) {
     return this.blogService.getBlogs(query);
   }
 
   @Get(':id')
+  @RequirePermissions('blog.read')
   @ApiOperation({ summary: '获取单个博客' })
   getBlog(@Param('id') id: string) {
     return this.blogService.getBlog(id);
   }
 
   @Post()
+  @RequirePermissions('blog.create')
   @ApiOperation({ summary: '创建博客' })
   createBlog(@Body() dto: CreateBlogDto) {
     return this.blogService.createBlog(dto);
   }
 
   @Put(':id')
+  @RequirePermissions('blog.update')
   @ApiOperation({ summary: '更新博客' })
   updateBlog(@Param('id') id: string, @Body() dto: UpdateBlogDto) {
     return this.blogService.updateBlog(id, dto);
   }
 
   @Delete(':id')
+  @RequirePermissions('blog.delete')
   @ApiOperation({ summary: '删除博客' })
   deleteBlog(@Param('id') id: string) {
     return this.blogService.deleteBlog(id);
   }
 
   @Post('export')
+  @RequirePermissions('blog.export')
   @ApiOperation({ summary: '批量导出Markdown' })
   async exportMarkdownZip(
     @Body() body: { ids: string[] },

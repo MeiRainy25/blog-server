@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { BlogModule } from './blogs/blogs.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { BlogModule } from './modules/blogs/blogs.module';
+import { UsersModule } from 'src/modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module';
-import { TagModule } from './tags/tags.module';
+import { PrismaModule } from 'src/modules/prisma/prisma.module';
+import { TagModule } from './modules/tags/tags.module';
+import { APP_GUARD } from '@nestjs/core';
+import { PermissionsGuard } from './guards/permission.guard';
 
 @Module({
   imports: [
@@ -18,6 +20,6 @@ import { TagModule } from './tags/tags.module';
     TagModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [{ provide: APP_GUARD, useClass: PermissionsGuard }],
 })
 export class AppModule {}

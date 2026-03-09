@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateTagDto, TagsQueryDto, UpdateTagDto } from './dto/tags.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 @Injectable()
 export class TagsService {

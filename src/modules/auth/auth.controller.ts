@@ -14,9 +14,9 @@ import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import type { Request, Response } from 'express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RefreshJwtGuard } from './guards/refresh.jwt.guard';
-import { AccessJwtGuard } from './guards/access.jwt.guard';
-import { UsersService } from 'src/users/users.service';
+import { RefreshJwtGuard } from '../../guards/refresh.jwt.guard';
+import { AccessJwtGuard } from '../../guards/access.jwt.guard';
+import { UsersService } from '../users/users.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('auth')
