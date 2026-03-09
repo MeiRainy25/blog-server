@@ -9,7 +9,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,11 +19,12 @@ import { AccessJwtGuard } from 'src/guards/access.jwt.guard';
 import { RequirePermissions } from 'src/decorator/permission.decorator';
 import type { Request } from 'express';
 import * as argon2 from 'argon2';
+import { PermissionsGuard } from 'src/guards/permission.guard';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('Users')
 @Controller('manage/users')
-@UseGuards(AccessJwtGuard)
+@UseGuards(AccessJwtGuard, PermissionsGuard)
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
@@ -66,13 +66,5 @@ export class UsersController {
   @ApiOperation({ summary: '删除用户' })
   async deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);
-  }
-
-  @Get('/me/permissions')
-  @ApiOperation({ summary: '获取用户权限信息' })
-  async getUserPermissions(@Req() req: Request) {
-    const user = req.user as { sub: string; email: string; nickname: string };
-
-    return this.userService.getUserPermissions(user.sub);
   }
 }

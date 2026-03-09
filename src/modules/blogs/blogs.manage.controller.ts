@@ -18,9 +18,10 @@ import { AccessJwtGuard } from 'src/guards/access.jwt.guard';
 import type { Response } from 'express';
 import archiver from 'archiver';
 import { RequirePermissions } from 'src/decorator/permission.decorator';
+import { PermissionsGuard } from 'src/guards/permission.guard';
 @ApiTags('ManageBlogs')
 @Controller('manage/blogs')
-@UseGuards(AccessJwtGuard)
+@UseGuards(AccessJwtGuard, PermissionsGuard)
 export class BlogManageController {
   constructor(private readonly blogService: BlogService) {}
 

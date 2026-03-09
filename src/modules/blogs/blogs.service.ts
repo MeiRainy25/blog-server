@@ -93,7 +93,6 @@ export class BlogService {
   }
 
   async updateBlog(id: string, dto: UpdateBlogDto) {
-    this.logger.debug(`Updating blog ${id} with data: ${JSON.stringify(dto)}`);
     return await this.prisma.blog.update({
       where: { id },
       data: {

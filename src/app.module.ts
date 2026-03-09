@@ -5,8 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'src/modules/prisma/prisma.module';
 import { TagModule } from './modules/tags/tags.module';
-import { APP_GUARD } from '@nestjs/core';
-import { PermissionsGuard } from './guards/permission.guard';
+import { PermissionModule } from './modules/permission/permission.module';
 
 @Module({
   imports: [
@@ -18,8 +17,9 @@ import { PermissionsGuard } from './guards/permission.guard';
     AuthModule,
     PrismaModule,
     TagModule,
+    PermissionModule,
   ],
   controllers: [],
-  providers: [{ provide: APP_GUARD, useClass: PermissionsGuard }],
+  providers: [],
 })
 export class AppModule {}

@@ -3,16 +3,19 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from 'src/decorator/permission.decorator';
-import { UsersService } from 'src/modules/users/users.service';
+import { PermissionService } from 'src/modules/permission/permission.service';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
+  private readonly logger = new Logger(PermissionsGuard.name);
+
   constructor(
     private readonly reflector: Reflector,
-    private readonly userService: UsersService,
+    private readonly permissionService: PermissionService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -31,7 +34,7 @@ export class PermissionsGuard implements CanActivate {
       throw new ForbiddenException();
     }
 
-    const codes = await this.userService.getUserPermissions(userId);
+    const codes = await this.permissionService.getUserPermissions(userId);
 
     const ok = required.every((p) => codes.has(p));
     if (!ok) {

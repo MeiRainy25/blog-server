@@ -14,10 +14,11 @@ import { AccessJwtGuard } from 'src/guards/access.jwt.guard';
 import { TagsService } from './tags.service';
 import { CreateTagDto, TagsQueryDto, UpdateTagDto } from './dto/tags.dto';
 import { RequirePermissions } from 'src/decorator/permission.decorator';
+import { PermissionsGuard } from 'src/guards/permission.guard';
 
 @ApiTags('ManageTags')
 @Controller('manage/tags')
-@UseGuards(AccessJwtGuard)
+@UseGuards(AccessJwtGuard, PermissionsGuard)
 export class TagManageController {
   constructor(private readonly tagService: TagsService) {}
 

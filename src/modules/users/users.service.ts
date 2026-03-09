@@ -160,14 +160,10 @@ export class UsersService {
       },
     });
 
-    if (!user) {
-      throw new NotFoundException(`用户${userId}不存在`);
-    }
-
     const codes: string[] =
       user?.roles.flatMap((role) => {
-        const pCodes = role.permissions.map((p) => p.code as string);
-        return pCodes as string[];
+        const pCodes = role.permissions.map((p) => p.code);
+        return pCodes;
       }) ?? [];
 
     const permissionCodes = new Set<string>(codes);
