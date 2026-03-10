@@ -21,7 +21,6 @@ export class PermissionService {
         },
       },
     });
-
     const codes: string[] =
       user?.roles.flatMap((role) => {
         const pCodes = role.permissions.map((p) => p.code);
@@ -29,5 +28,11 @@ export class PermissionService {
       }) ?? [];
 
     return [...new Set(codes)];
+  }
+
+  // 获取所有权限
+  async getAllPermissions() {
+    const permissions = await this.prisma.permission.findMany();
+    return permissions;
   }
 }

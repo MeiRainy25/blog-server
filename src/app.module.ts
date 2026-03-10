@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'src/modules/prisma/prisma.module';
 import { TagModule } from './modules/tags/tags.module';
 import { PermissionModule } from './modules/permission/permission.module';
+import { RoleModule } from './modules/role/role.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PermissionModule } from './modules/permission/permission.module';
     PrismaModule,
     TagModule,
     PermissionModule,
+    RoleModule,
   ],
   controllers: [],
   providers: [],

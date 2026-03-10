@@ -4,6 +4,7 @@ export class UserEntity {
   id: string;
   email: string;
   nickname: string;
+  roles: string[];
 
   @Exclude()
   password: string;

@@ -39,13 +39,24 @@ export class UsersService {
           nickname: true,
           createdAt: true,
           updatedAt: true,
+          roles: {
+            select: {
+              code: true,
+            },
+          },
         },
       }),
       this.prisma.user.count(),
     ]);
 
     return {
-      data: users.map((user) => new UserEntity(user)),
+      data: users.map(
+        (user) =>
+          new UserEntity({
+            ...user,
+            roles: user.roles?.map((r) => r.code) ?? [],
+          }),
+      ),
       total,
     };
   }
@@ -53,31 +64,79 @@ export class UsersService {
   async getUserById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      include: {
+        roles: {
+          select: {
+            code: true,
+          },
+        },
+      },
     });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-    return new UserEntity(user);
+    return new UserEntity({
+      ...user,
+      roles: user.roles?.map((r) => r.code) ?? [],
+    });
   }
 
   async getUserByEmail(email: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      include: {
+        roles: {
+          select: {
+            code: true,
+          },
+        },
+      },
     });
-    return user ? new UserEntity(user) : null;
+    return user
+      ? new UserEntity({
+          ...user,
+          roles: user.roles?.map((r) => r.code) ?? [],
+        })
+      : null;
   }
 
   async createUser(dto: CreateUserDto) {
     try {
+      const roleCodes = dto.roles ?? [];
+      if (roleCodes.length > 0) {
+        const existing = await this.prisma.role.findMany({
+          where: { code: { in: roleCodes } },
+          select: { code: true },
+        });
+        const existingSet = new Set(existing.map((r) => r.code));
+        const missing = roleCodes.filter((c) => !existingSet.has(c));
+        if (missing.length > 0) {
+          throw new BadRequestException(`角色不存在: ${missing.join(', ')}`);
+        }
+      }
+
       const user = await this.prisma.user.create({
         data: {
           email: dto.email,
           nickname: dto.nickname,
           password: dto.password,
           refreshToken: dto.refreshToken,
+          roles: {
+            connect: roleCodes.map((code) => ({ code })),
+          },
+        },
+        include: {
+          roles: {
+            select: {
+              code: true,
+            },
+          },
         },
       });
-      return new UserEntity(user);
+      return new UserEntity({
+        ...user,
+        roles: user.roles?.map((r) => r.code) ?? [],
+      });
     } catch (e) {
       if (isPrismaExistException(e)) {
         this.logger.warn(`User with email ${dto.email} already exists`);
@@ -90,11 +149,47 @@ export class UsersService {
 
   async updateUser(userId: string, dto: UpdateUserDto) {
     try {
+      const { roles, password, ...rest } = dto;
+      const roleCodes = roles ?? undefined;
+      if (roleCodes && roleCodes.length > 0) {
+        const existing = await this.prisma.role.findMany({
+          where: { code: { in: roleCodes } },
+          select: { code: true },
+        });
+        const existingSet = new Set(existing.map((r) => r.code));
+        const missing = roleCodes.filter((c) => !existingSet.has(c));
+        if (missing.length > 0) {
+          throw new BadRequestException(`角色不存在: ${missing.join(', ')}`);
+        }
+      }
+
+      const passwordHash = password ? await hash(password) : undefined;
+
       const user = await this.prisma.user.update({
         where: { id: userId },
-        data: dto,
+        data: {
+          ...rest,
+          ...(passwordHash ? { password: passwordHash } : null),
+          ...(roleCodes
+            ? {
+                roles: {
+                  set: roleCodes.map((code) => ({ code })),
+                },
+              }
+            : null),
+        },
+        include: {
+          roles: {
+            select: {
+              code: true,
+            },
+          },
+        },
       });
-      return new UserEntity(user);
+      return new UserEntity({
+        ...user,
+        roles: user.roles?.map((r) => r.code) ?? [],
+      });
     } catch (e) {
       if (isPrismaExistException(e)) {
         this.logger.warn(`User with email ${dto.email} already exists`);
@@ -108,8 +203,18 @@ export class UsersService {
   async deleteUser(userId: string) {
     const user = await this.prisma.user.delete({
       where: { id: userId },
+      include: {
+        roles: {
+          select: {
+            code: true,
+          },
+        },
+      },
     });
-    return new UserEntity(user);
+    return new UserEntity({
+      ...user,
+      roles: user.roles?.map((r) => r.code) ?? [],
+    });
   }
 
   // 修改存储的refreshToken
@@ -143,31 +248,5 @@ export class UsersService {
         },
       });
     });
-  }
-
-  // 获取用户权限
-  async getUserPermissions(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        roles: {
-          select: {
-            permissions: {
-              select: { code: true },
-            },
-          },
-        },
-      },
-    });
-
-    const codes: string[] =
-      user?.roles.flatMap((role) => {
-        const pCodes = role.permissions.map((p) => p.code);
-        return pCodes;
-      }) ?? [];
-
-    const permissionCodes = new Set<string>(codes);
-
-    return permissionCodes;
   }
 }

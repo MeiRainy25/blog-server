@@ -17,4 +17,10 @@ export class PermissionController {
 
     return this.permissionService.getUserPermissions(user.sub);
   }
+
+  @Get()
+  @ApiOperation({ summary: '获取所有权限信息' })
+  async getAllPermissions() {
+    return this.permissionService.getAllPermissions();
+  }
 }

@@ -75,6 +75,26 @@ const permissions = [
     name: '删除用户',
     description: '允许用户删除用户',
   },
+  {
+    code: 'role.read',
+    name: '查看角色',
+    description: '允许用户查看角色信息',
+  },
+  {
+    code: 'role.create',
+    name: '创建角色',
+    description: '允许用户创建角色',
+  },
+  {
+    code: 'role.update',
+    name: '更新角色',
+    description: '允许用户更新角色',
+  },
+  {
+    code: 'role.delete',
+    name: '删除角色',
+    description: '允许用户删除角色',
+  },
 ];
 
 async function initPermissions() {

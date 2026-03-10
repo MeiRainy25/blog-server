@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsIn,
   IsInt,
+  IsArray,
   IsOptional,
   IsString,
   Max,
@@ -71,6 +72,15 @@ export class UpdateUserDto {
   password?: string;
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ApiPropertyOptional({
+    example: ['admin', 'editor'],
+    description: '用户角色 code 列表（可选）',
+  })
+  roles?: string[];
+
+  @IsOptional()
   @IsString()
   @ApiProperty({
     example: 'refreshToken123',
@@ -101,6 +111,15 @@ export class CreateUserDto {
     description: 'User password',
   })
   password: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ApiPropertyOptional({
+    example: ['admin', 'editor'],
+    description: '用户角色 code 列表（可选）',
+  })
+  roles?: string[];
 
   @IsOptional()
   @IsString()
