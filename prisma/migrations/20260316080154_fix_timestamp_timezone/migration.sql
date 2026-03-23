@@ -1,0 +1,75 @@
+-- AlterTable
+ALTER TABLE "Blog" ALTER COLUMN "createdAt" SET DATA TYPE TIMESTAMPTZ(3),
+ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMPTZ(3),
+ALTER COLUMN "embeddedAt" SET DATA TYPE TIMESTAMPTZ(3);
+
+-- AlterTable
+ALTER TABLE "Permission" ALTER COLUMN "createdAt" SET DATA TYPE TIMESTAMPTZ(3),
+ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMPTZ(3);
+
+-- AlterTable
+ALTER TABLE "Role" ALTER COLUMN "createdAt" SET DATA TYPE TIMESTAMPTZ(3),
+ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMPTZ(3);
+
+-- AlterTable
+ALTER TABLE "Tag" ALTER COLUMN "createdAt" SET DATA TYPE TIMESTAMPTZ(3),
+ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMPTZ(3);
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "createdAt" SET DATA TYPE TIMESTAMPTZ(3),
+ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMPTZ(3);
+
+ALTER TABLE "Blog"
+ALTER COLUMN "updatedAt"
+TYPE timestamptz(3)
+USING "updatedAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "Blog"
+ALTER COLUMN "embeddedAt"
+TYPE timestamptz(3)
+USING "embeddedAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "Blog"
+ALTER COLUMN "createdAt"
+TYPE timestamptz(3)
+USING "createdAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "User"
+ALTER COLUMN "createdAt"
+TYPE timestamptz(3)
+USING "createdAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "User"
+ALTER COLUMN "updatedAt"
+TYPE timestamptz(3)
+USING "updatedAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "Role"
+ALTER COLUMN "createdAt"
+TYPE timestamptz(3)
+USING "createdAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "Role"
+ALTER COLUMN "updatedAt"
+TYPE timestamptz(3)
+USING "updatedAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "Permission"
+ALTER COLUMN "createdAt"
+TYPE timestamptz(3)
+USING "createdAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "Permission"
+ALTER COLUMN "updatedAt"
+TYPE timestamptz(3)
+USING "updatedAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "Tag"
+ALTER COLUMN "createdAt"
+TYPE timestamptz(3)
+USING "createdAt" AT TIME ZONE 'UTC';
+
+ALTER TABLE "Tag"
+ALTER COLUMN "updatedAt"
+TYPE timestamptz(3)
+USING "updatedAt" AT TIME ZONE 'UTC';

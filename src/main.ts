@@ -17,10 +17,15 @@ async function bootstrap() {
     .setDescription('API Documentation')
     .setVersion('1.0')
     .addBearerAuth()
+    .addServer('/api') // 路由添加api前缀
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs/api-docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      withCredentials: true,
+    },
+  });
 
   app.set('query parse', 'extended');
   app.useGlobalPipes(

@@ -7,8 +7,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
     const adapter = new PrismaPg({
       connectionString: process.env.DATABASE_URL as string,
+      options: '-c timezone=UTC',
     });
-    super({ adapter } satisfies Prisma.PrismaClientOptions);
+    super({
+      adapter,
+    } satisfies Prisma.PrismaClientOptions);
   }
 
   async onModuleInit() {

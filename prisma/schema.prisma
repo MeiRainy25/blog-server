@@ -22,8 +22,8 @@ model User {
   blogs        Blog[]
   refreshToken String? // 可选字段，存储用户的刷新Token
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   roles Role[] @relation("UserRoles")
 }
@@ -37,8 +37,8 @@ model Role {
   users       User[]       @relation("UserRoles")
   permissions Permission[] @relation("RolePermissions")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 }
 
 model Permission {
@@ -48,20 +48,21 @@ model Permission {
   description String?
 
   roles     Role[]   @relation("RolePermissions")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 }
 
 model Blog {
-  id        String   @id @default(cuid())
-  title     String
-  content   Json
-  markdown  String
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
-  tags      Tag[]    @relation("BlogTags")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String    @id @default(cuid())
+  title      String
+  content    Json
+  markdown   String
+  author     User      @relation(fields: [authorId], references: [id])
+  authorId   String
+  tags       Tag[]     @relation("BlogTags")
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime  @updatedAt @db.Timestamptz(3)
+  embeddedAt DateTime? @db.Timestamptz(3) // 可选字段，存储博客被嵌入的时间
 }
 
 model Tag {
@@ -70,6 +71,6 @@ model Tag {
   blogs     Blog[]   @relation("BlogTags")
   group     String? // Tag分组
   color     String? // Tag颜色
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 }

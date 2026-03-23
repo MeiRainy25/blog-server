@@ -7,6 +7,7 @@ import { PrismaModule } from 'src/modules/prisma/prisma.module';
 import { TagModule } from './modules/tags/tags.module';
 import { PermissionModule } from './modules/permission/permission.module';
 import { RoleModule } from './modules/role/role.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RoleModule } from './modules/role/role.module';
     TagModule,
     PermissionModule,
     RoleModule,
+    AiModule,
   ],
   controllers: [],
   providers: [],
