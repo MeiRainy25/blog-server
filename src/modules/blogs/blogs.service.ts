@@ -14,11 +14,24 @@ export class BlogService {
     const skip = (page - 1) * pageSize;
 
     const orderBy = { [query.sortBy ?? 'createdAt']: query.order ?? 'desc' };
+
+    const where = {
+      ...(query.tags &&
+        query.tags.length > 0 && {
+          tags: {
+            some: {
+              id: { in: query.tags },
+            },
+          },
+        }),
+    };
+
     const [blogs, total] = await this.prisma.$transaction([
       this.prisma.blog.findMany({
         skip,
         take: pageSize,
         orderBy,
+        where,
         select: {
           id: true,
           title: true,
@@ -42,7 +55,7 @@ export class BlogService {
           },
         },
       }),
-      this.prisma.blog.count(),
+      this.prisma.blog.count({ where }),
     ]);
 
     return {

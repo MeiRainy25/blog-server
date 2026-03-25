@@ -110,4 +110,21 @@ export class BlogsQueryDto {
     description: '排序方式，默认为desc',
   })
   order?: 'asc' | 'desc' = 'desc';
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.split(',').map((v) => parseInt(v.trim(), 10));
+    }
+    if (Array.isArray(value)) {
+      return value.map((v) => parseInt(String(v), 10));
+    }
+    return [];
+  })
+  @IsArray()
+  @ApiPropertyOptional({
+    example: '1,2,3',
+    description: '标签ID列表，用逗号分隔',
+  })
+  tags?: number[];
 }
