@@ -84,16 +84,16 @@ export class BlogsQueryDto {
   @Transform(({ value }) => Number(value))
   @IsInt()
   @Min(1)
-  @ApiPropertyOptional({ example: 1, description: '页码，默认为1' })
-  page?: number = 1;
+  @ApiPropertyOptional({ example: 1, description: '页码，不传则不分页' })
+  page?: number;
 
   @IsOptional()
   @Transform(({ value }) => Number(value))
   @IsInt()
   @Min(1)
   @Max(100)
-  @ApiPropertyOptional({ example: 10, description: '单页数据量, 默认10' })
-  pageSize?: number = 10;
+  @ApiPropertyOptional({ example: 10, description: '单页数据量，不传则不分页' })
+  pageSize?: number;
 
   @IsOptional()
   @IsIn(['createdAt', 'updatedAt'])
@@ -127,4 +127,14 @@ export class BlogsQueryDto {
     description: '标签ID列表，用逗号分隔',
   })
   tags?: number[];
+
+  @IsOptional()
+  @ApiPropertyOptional({
+    example: {
+      logic: 'and',
+      property: { operator: 'contains', value: 'title:技术' },
+    },
+    description: '复杂过滤条件',
+  })
+  filters?: any;
 }

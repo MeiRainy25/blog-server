@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, Post, Body } from '@nestjs/common';
 import { BlogService } from './blogs.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BlogsQueryDto } from './dto/blog.dto';
@@ -18,5 +18,11 @@ export class BlogPublicController {
   @ApiOperation({ summary: '获取单个博客' })
   getBlog(@Param('id') id: string) {
     return this.blogService.getBlog(id);
+  }
+
+  @Post('search')
+  @ApiOperation({ summary: '复杂条件搜索博客' })
+  searchBlogs(@Body() body: BlogsQueryDto) {
+    return this.blogService.getBlogs(body);
   }
 }

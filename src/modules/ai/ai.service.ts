@@ -118,7 +118,6 @@ export class AiService {
    * @returns Promise<HistoryMessage[]> 历史对话消息数组
    */
   async getHistory(session_id: string): Promise<HistoryMessage[]> {
-    this.logger.debug(session_id);
     const response = await fetch(`${this.aiUrl}/api/history`, {
       method: 'POST',
       headers: {
